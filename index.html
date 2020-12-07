@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <title>Serving Raster Using Geoserver and Leaflet JS</title>
+
+    <style>
+      #mapid { 
+        height: 100vh; 
+        }
+      body {
+        margin: 0;
+        padding: 0
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mapid"></div>
+    <script>
+
+    let mymap = L.map('mapid').setView([-7.914265321201391, 112.63226509094238], 16);
+    
+    mymap.setMinZoom(13);
+    mymap.setMaxZoom(20);
+    
+    mymap.fitBounds([[-7.912565054307239, 112.65192031860353],
+    [-7.9196423690807,112.62260913848878]]);
+
+    let OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    maxZoom: 19,
+	    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mymap);
+
+    let Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }); 
+
+    let Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    });
+
+    let raster = L.tileLayer.wms("https://tomcat.geosai.my.id/geoserver/raster_ws/wms?", {
+      layers: 'raster_ws:orto_foto_udara_rendered',
+      format: 'image/png',
+      transparent: true,
+      attribution: "<a href=https://geosai.my.id>geosai.my.id</a>",
+      tiled: true
+    }).addTo(mymap); 
+
+    let baseLayer = {
+      "Open Street Map": OpenStreetMap_Mapnik,
+      "ESRI World Imagery": Esri_WorldImagery,
+      "ESRI World Street Map": Esri_WorldStreetMap
+    };
+   
+    let overlayLayer = {
+      "Ortofoto Matra Udara": raster
+    }
+
+    L.control.layers(baseLayer, overlayLayer).addTo(mymap);
+
+    </script>
+  </body>
+</html>
